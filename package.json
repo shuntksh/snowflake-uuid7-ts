@@ -1,0 +1,18 @@
+{
+  "name": "snowflake-uuid7-browser-ts",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "lint": "biome lint --apply src",
+    "format": "biome format --write src",
+    "test": "vitest --run"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.7.3",
+    "@types/bun": "latest",
+    "vitest": "1.6.0"
+  },
+  "peerDependencies": {
+    "typescript": "5.4.5"
+  }
+}
