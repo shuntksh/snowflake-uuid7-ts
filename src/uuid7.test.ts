@@ -1,5 +1,20 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { UUIDv7 } from "./uuid7";
+
+function computeEntropy(value: bigint): number {
+  const bit: ("0" | "1")[] = value
+    .toString(2)
+    .split("")
+    .map((v) => (v === "1" ? "1" : "0"));
+  const freq: { "1": number; "0": number } = { "1": 0, "0": 0 };
+  for (let i = 0; i < bit.length; i++) {
+    freq[bit[i]]++;
+  }
+  const totalBits = bit.length;
+  const probabilities = Object.values(freq).map((count) => count / totalBits);
+  const entropy = probabilities.reduce((acc, p) => acc - p * Math.log2(p), 0);
+  return entropy;
+}
 
 describe("randomUUID7", () => {
   it("should generate UUID with dashes", () => {
@@ -28,12 +43,17 @@ describe("randomUUID7", () => {
   it("should not generate the same UUID for the same timestamp while monotonically increasing", () => {
     vi.useFakeTimers();
     const v7 = new UUIDv7();
-    let uuid1 = v7.generateBinary();
+    let uuid1 = v7.generate();
     for (let i = 0; i < 100; i++) {
-      const uuid2 = v7.generateBinary();
-      expect(uuid2[0]).not.toBe(uuid1[0]);
-      expect(uuid2[1]).not.toBe(uuid1[1]);
-      expect(uuid2[1]).toBeGreaterThan(uuid1[1]); // Lexicographically less than
+      const uuid2 = v7.generate();
+      const parsed1 = UUIDv7.parse(uuid1);
+      const parsed2 = UUIDv7.parse(uuid2);
+      expect(uuid2).not.toBe(uuid1);
+      expect(parsed2.timestamp).toBe(parsed1.timestamp);
+      expect(Number(parsed2.randA)).toBeGreaterThan(Number(parsed1.randA)); // Lexicographically less than
+      expect(parsed2.randB).not.toBe(parsed1.randB); // Lexicographically less than
+      // Sanity check for randomness
+      expect(computeEntropy(parsed1.binary[1])).toBeGreaterThan(0);
       uuid1 = uuid2;
     }
     vi.useRealTimers();
