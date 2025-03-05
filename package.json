@@ -3,16 +3,16 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "lint": "biome lint --apply src",
+    "lint": "biome check src",
+    "lint:fix": "biome check --write src",
     "format": "biome format --write src",
-    "test": "vitest --run"
+    "test": "bun test"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.7.3",
-    "@types/bun": "latest",
-    "vitest": "1.6.0"
+    "@biomejs/biome": "1.9.4",
+    "@types/bun": "^1.2.4"
   },
   "peerDependencies": {
-    "typescript": "5.4.5"
+    "typescript": "5.8.2"
   }
 }

@@ -1,12 +1,12 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, setSystemTime } from "bun:test";
 import { Snowflake } from "./snowflake";
 
 describe("snowflake id", () => {
 	beforeEach(() => {
-		vi.useFakeTimers();
+		setSystemTime(new Date("2025-03-06T00:00:00.000Z"));
 	});
 	afterEach(() => {
-		vi.useRealTimers();
+		setSystemTime(); // reset to real time
 	});
 
 	it("should generate unique ids in the same timestamp window", () => {
@@ -26,7 +26,7 @@ describe("snowflake id", () => {
 		const snowflakeId = new Snowflake(1);
 
 		const id1 = snowflakeId.generate();
-		vi.advanceTimersByTime(1);
+		setSystemTime(new Date("2025-03-06T00:00:00.001Z"));
 		const id2 = snowflakeId.generate();
 
 		const parsed1 = Snowflake.parse(id1);
